@@ -79,7 +79,7 @@ app.get('/task/:id/work', (req, res) ->
   ]).exec (err, replies) ->
     [code, input] = replies
     # Add it back to the queue in case we fail
-    db.rpush("tasks:#{id}:inputs", input)
+    db.rpush("task:#{id}:inputs", input)
     res.send input: JSON.parse(input), code: code
 )
 
@@ -92,6 +92,10 @@ app.post('/task/:id/work', (req, res) ->
   # Add to the results set:
   db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result))
   db.lrem("task:#{id}:inputs", 0, JSON.stringify(input))
+  db.llen("task:#{id}:inputs", (err, len) ->
+    if len is 0
+      db.sadd('task:completed', id)
+  )
   res.send 'Something'
 )
 
