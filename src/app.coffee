@@ -91,14 +91,14 @@ app.post('/task/:id/work', (req, res) ->
   input = req.param('input')
   result = req.param('result')
   # Add to the results set:
-  db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result))
+  db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result), redis.print)
   db.lrem("task:#{id}:inputs", 0, JSON.stringify(input))
   db.llen("task:#{id}:inputs", (err, len) ->
     if len is 0
       db.sadd('task:completed', id)
       db.srem('task:ongoing', id)
+    res.send more: len isnt 0
   )
-  res.send 'Something'
 )
 
 # Get results for a task so far
