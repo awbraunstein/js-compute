@@ -5,27 +5,27 @@
 
   if (typeof window === 'undefined') {
     start = function() {
-      var cond, more;
-      more = false;
+      var cond;
+      _this.more = false;
       cond = function() {
-        return more;
+        return _this.more;
       };
       return doWhile(runCode, cond);
     };
     runCode = function() {
-      var more, request, response, taskId;
-      taskId = 3;
-      importScripts("http://localhost:3000/task/" + taskId + "/work");
+      var request, response, taskId;
+      taskId = 7;
+      importScripts("http://4yzb.localtunnel.com/task/" + taskId + "/work");
       response = {
         result: task(params),
-        input: taskId
+        input: params
       };
       request = new XMLHttpRequest();
-      request.open('POST', "http://localhost:3000/task/" + taskId + "/work", false);
+      request.open('POST', "http://4yzb.localtunnel.com/task/" + taskId + "/work", false);
       request.setRequestHeader("Content-type", "application/json");
       request.send(JSON.stringify(response));
       if (request.status === 200) {
-        return more = JSON.parse(request.responseText).more || false;
+        return _this.more = JSON.parse(request.responseText).more || false;
       }
     };
     this.onmessage = function(event) {

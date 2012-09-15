@@ -2,23 +2,23 @@ if typeof window is 'undefined'
   start = () =>
 
 
-    more = false
-    cond = () => more
+    @more = false
+    cond = () => @more
     doWhile(runCode, cond)
 
-  runCode = () ->
-    taskId = 3
-    importScripts("http://localhost:3000/task/#{taskId}/work")
+  runCode = () =>
+    taskId = 7
+    importScripts("http://4yzb.localtunnel.com/task/#{taskId}/work")
     response =
       result: task(params)
-      input: taskId
+      input: params
 
     request = new XMLHttpRequest()
-    request.open('POST', "http://localhost:3000/task/#{taskId}/work", false)
+    request.open('POST', "http://4yzb.localtunnel.com/task/#{taskId}/work", false)
     request.setRequestHeader("Content-type", "application/json");
     request.send(JSON.stringify(response))
     if request.status is 200
-      more = JSON.parse(request.responseText).more || false
+      @more = JSON.parse(request.responseText).more || false
 
   @onmessage = (event) ->
     start()
