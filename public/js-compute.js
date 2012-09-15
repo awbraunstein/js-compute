@@ -7,13 +7,13 @@
     start = function() {
       var request, response;
       postMessage('Start');
-      importScripts('http://localhost:3000/run-me.js');
+      importScripts('http://localhost:3000/task/work');
       response = {
         result: task(params),
         taskId: taskId
       };
       request = new XMLHttpRequest();
-      request.open('POST', 'http://localhost:3000/', false);
+      request.open('POST', "http://localhost:3000/" + response.taskId + "/work", false);
       return request.send(JSON.stringify(response));
     };
     this.onmessage = function(event) {
