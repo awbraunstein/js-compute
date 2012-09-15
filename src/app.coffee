@@ -14,7 +14,7 @@ app.use(express.bodyParser())
 
 app.all('/*', (req, res, next) ->
   res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With')
+  res.header('Access-Control-Allow-Headers', 'origin, X-Requested-With, content-type')
   next()
 )
 
@@ -72,7 +72,8 @@ app.get('/task/work', (req, res) ->
 )
 
 # Get the code/input to do a task for an input
-app.get('/task/:id/work', (req, res) ->
+
+getTask = (req, res) ->
   id = req.param('id')
   db.multi([
     ['get', "task:#{id}:code"],
@@ -87,6 +88,13 @@ app.get('/task/:id/work', (req, res) ->
   
              #{code}
              """
+  
+app.get('/task/:id/work', (req, res) ->
+  getTask(req, res)
+)
+
+app.options('/task/:id/work', (req, res) ->
+  getTask(req, res)
 )
 
 # Callback for when a task has finished for an input
