@@ -50,11 +50,12 @@ app.get('/run-me.js', (req, res) ->
 app.post('/task/create', (req, res) ->
   code = req.param('code')
   inputs = req.param('inputs')
-  db.get('task:last_id', (err, reply) =>
-    id = parseInt(reply[0])
+  db.get('task:last_id', (err, id) =>
+    id = parseInt(id)
     db.incr('task:last_id')
     db.set("task:#{id}:code", code)
     db.sadd('task:all', id)
+    db.sadd('task:ongoing', id)
     # Should be a way to lpush everything at once
     for input in inputs
       db.lpush("task:#{id}:inputs", JSON.stringify(input))
@@ -64,7 +65,7 @@ app.post('/task/create', (req, res) ->
 
 # Work on a random task
 app.get('/task/work', (req, res) ->
-  db.srandmember('task:all', (err, id) ->
+  db.srandmember('task:ongoing', (err, id) ->
     # Should work with AJAX?
     res.redirect("/task/#{id}/work")
   )
@@ -95,6 +96,7 @@ app.post('/task/:id/work', (req, res) ->
   db.llen("task:#{id}:inputs", (err, len) ->
     if len is 0
       db.sadd('task:completed', id)
+      db.srem('task:ongoing', id)
   )
   res.send 'Something'
 )
