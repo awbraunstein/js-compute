@@ -1,0 +1,4 @@
+ - 'task:$id:code' -- the code to be run for task $id
+ - 'task:$id:inputs' -- queue of inputs for task $id. These inputs are all potentially unrun
+ - 'task:$id:results' -- hash mapping inputs (JSON strings as produced by JSON.stringify) to results (JSON strings as produced by JSON.stringify)
+ - 'task:all' -- set of all task ids
