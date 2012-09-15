@@ -44,6 +44,7 @@ app.get('/run-me.js', (req, res) ->
       return console.log(err)
     res.send data
   )
+)
 
 # Create a task
 app.post('/task/create', (req, res) ->
@@ -66,6 +67,7 @@ app.get('/task/work', (req, res) ->
   db.srandmember('task:all', (err, id) ->
     # Should work with AJAX?
     res.redirect("/task/#{id}/work")
+  )
 )
 
 # Get the code/input to do a task for an input
@@ -95,9 +97,10 @@ app.post('/task/:id/work', (req, res) ->
 
 # Get results for a task so far
 app.get('/task/:id', (req, res) ->
-  db.hgetall "task:#{req.param('id')}:results", (err, reply) =>
+  db.hgetall ("task:#{req.param('id')}:results", (err, reply) =>
     # Output should be better later
     res.send reply
+  )
 )
 
 app.listen 3000
