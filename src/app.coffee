@@ -50,8 +50,8 @@ app.get('/run-me.js', (req, res) ->
 app.post('/task/create', (req, res) ->
   code = req.param('code')
   inputs = req.param('inputs')
-  db.get('task:last_id', (err, reply) =>
-    id = parseInt(reply[0])
+  db.get('task:last_id', (err, id) =>
+    id = parseInt(id)
     db.incr('task:last_id')
     db.set("task:#{id}:code", code)
     db.sadd('task:all', id)
@@ -80,7 +80,12 @@ app.get('/task/:id/work', (req, res) ->
     [code, input] = replies
     # Add it back to the queue in case we fail
     db.rpush("tasks:#{id}:inputs", input)
-    res.send input: JSON.parse(input), code: code
+    res.send """           
+             taskId = #{id};
+             params = JSON.parse(#{JSON.stringify(input)});
+  
+             #{code}
+             """
 )
 
 # Callback for when a task has finished for an input
@@ -90,8 +95,10 @@ app.post('/task/:id/work', (req, res) ->
   input = req.param('input')
   result = req.param('result')
   # Add to the results set:
-  db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result))
-  db.lrem("task:#{id}:inputs", 0, JSON.stringify(input))
+  console.log input
+  console.log result
+  db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result), redis.print)
+  db.lrem("task:#{id}:inputs", 0, JSON.stringify(input), redis.print)
   res.send 'Something'
 )
 
