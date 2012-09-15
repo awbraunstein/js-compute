@@ -8,9 +8,9 @@ db = redis.createClient(dbconfig['port'] || 6379, dbconfig['host'] || 'localhost
 db.on 'error', (err) ->
   console.log "Redis error: #{err}"
 
-app.use(express.bodyParser())
-
 app = express()
+
+app.use(express.bodyParser())
 
 app.all('/*', (req, res, next) ->
   res.header('Access-Control-Allow-Origin', '*')
@@ -97,7 +97,7 @@ app.post('/task/:id/work', (req, res) ->
 
 # Get results for a task so far
 app.get('/task/:id', (req, res) ->
-  db.hgetall ("task:#{req.param('id')}:results", (err, reply) =>
+  db.hgetall("task:#{req.param('id')}:results", (err, reply) =>
     # Output should be better later
     res.send reply
   )
