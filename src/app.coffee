@@ -55,6 +55,7 @@ app.post('/task/create', (req, res) ->
     db.incr('task:last_id')
     db.set("task:#{id}:code", code)
     db.sadd('task:all', id)
+    db.sadd('task:ongoing', id)
     # Should be a way to lpush everything at once
     for input in inputs
       db.lpush("task:#{id}:inputs", JSON.stringify(input))
@@ -64,7 +65,7 @@ app.post('/task/create', (req, res) ->
 
 # Work on a random task
 app.get('/task/work', (req, res) ->
-  db.srandmember('task:all', (err, id) ->
+  db.srandmember('task:ongoing', (err, id) ->
     # Should work with AJAX?
     res.redirect("/task/#{id}/work")
   )
@@ -95,11 +96,14 @@ app.post('/task/:id/work', (req, res) ->
   input = req.param('input')
   result = req.param('result')
   # Add to the results set:
-  console.log input
-  console.log result
   db.hset("task:#{id}:results", JSON.stringify(input), JSON.stringify(result), redis.print)
-  db.lrem("task:#{id}:inputs", 0, JSON.stringify(input), redis.print)
-  res.send 'Something'
+  db.lrem("task:#{id}:inputs", 0, JSON.stringify(input))
+  db.llen("task:#{id}:inputs", (err, len) ->
+    if len is 0
+      db.sadd('task:completed', id)
+      db.srem('task:ongoing', id)
+    res.send more: len isnt 0
+  )
 )
 
 # Get results for a task so far
