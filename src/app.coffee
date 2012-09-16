@@ -15,8 +15,8 @@ app = express()
 
 app.use(express.bodyParser())
 
-app.set('views', __dirname + '/../views')
-app.use(express.static(__dirname + '/../public'))
+app.set('views', './views')
+app.use(express.static('./public'))
 app.engine('jade', require('jade').__express)
 
 app.all('/*', (req, res, next) ->
@@ -24,6 +24,9 @@ app.all('/*', (req, res, next) ->
   res.header('Access-Control-Allow-Headers', 'origin, X-Requested-With, content-type')
   next()
 )
+
+HOST = 'http://localhost:3000'
+SCRIPT = fs.readFileSync('./public/js-compute.js').toString()
 
 # Serve form for creating a new task
 app.get('/', (req, res) ->
@@ -62,7 +65,7 @@ app.get('/:id', (req, res) ->
     res.render 'task.jade',
       id: id
       ongoing: ongoing
-      results: results
+      results: results || {}
       title: title
       pending_count: pending_count
 )
@@ -76,7 +79,13 @@ app.get('/:id/results', (req, res) ->
 
 # Worker script (script to be embedded)
 app.get('/:id/worker', (req, res) ->
-  
+  id = req.param('id')
+  # Fuck it, ship it
+  db.get "task:#{id}:code", (err, code) =>
+    res.send """
+             #{code}
+             #{SCRIPT.replace('HOST', HOST).replace('TASK_ID', req.param('id'))}
+             """
 )
 
 # Work on a random task

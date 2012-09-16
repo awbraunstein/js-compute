@@ -15,15 +15,14 @@
       return _this.doWhile(runCode, cond);
     };
     runCode = function() {
-      var request, response, taskId;
-      taskId = 8;
-      importScripts("http://5a3t.localtunnel.com/task/" + taskId + "/work");
+      var request, response;
+      importScripts("HOST/task/TASK_ID/work");
       response = {
         result: task(params),
         input: params
       };
       request = new XMLHttpRequest();
-      request.open('POST', "http://5a3t.localtunnel.com/task/" + taskId + "/work", false);
+      request.open('POST', "HOST/task/TASK_ID/work", false);
       request.setRequestHeader("Content-type", "application/json");
       request.send(JSON.stringify(response));
       if (request.status === 200) {
