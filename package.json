@@ -5,9 +5,9 @@
     "private": true,
     "dependencies": {
         "express"      : "3.x",
-			  "hiredis"      : "*",
-			  "redis"        : "*",
-			  "jade"         : "*",
+        "hiredis"      : "*",
+        "redis"        : "*",
+        "jade"         : "*",
         "coffee-script": "*",
         "underscore"   : "*"
     }
