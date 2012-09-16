@@ -26,7 +26,7 @@ app.all('/*', (req, res, next) ->
   next()
 )
 
-HOST = 'http://andrewbraunstein:3000'
+HOST = 'http://andrewbraunstein.com:3000'
 SCRIPT = fs.readFileSync('./public/js-compute.js').toString()
 
 # Serve form for creating a new task
