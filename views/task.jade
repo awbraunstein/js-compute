@@ -2,7 +2,7 @@ extends layout
 block content
   h3= title
   - if (ongoing)
-		p You can embed this task with
+    p You can embed this task with
       code <script type="text/javascript" src="http://andrewbraunstein.com:3000/#{id}/worker"></script>
     p #{pending_count} results pending.
   - else
