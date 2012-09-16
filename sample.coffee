@@ -1,6 +1,8 @@
 # Check if n is prime
-task = (args) ->
+self.task = (args) ->
   n = args.n
+  return prime: false if n is 1
+  return prime: true if n is 2
   # Check even first...
   return prime: false if n % 2 is 0
   # Then check up to sqrt(n)
@@ -9,5 +11,3 @@ task = (args) ->
       return prime: false
   prime: true
 
-console.log task(n: 12)
-console.log task(n: 13)

@@ -21,7 +21,7 @@ app.engine('jade', require('jade').__express)
 
 app.all('/*', (req, res, next) ->
   res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With')
+  res.header('Access-Control-Allow-Headers', 'origin, X-Requested-With, content-type')
   next()
 )
 
@@ -88,7 +88,8 @@ app.get('/task/work', (req, res) ->
 )
 
 # Get the code/input to do a task for an input
-app.get('/task/:id/work', (req, res) ->
+
+getTask = (req, res) ->
   id = req.param('id')
   db.multi([
     ['get', "task:#{id}:code"],
@@ -96,8 +97,20 @@ app.get('/task/:id/work', (req, res) ->
   ]).exec (err, replies) ->
     [code, input] = replies
     # Add it back to the queue in case we fail
-    db.rpush("task:#{id}:inputs", input)
-    res.send input: JSON.parse(input), code: code
+    db.rpush("tasks:#{id}:inputs", input)
+    res.send """           
+             taskId = #{id};
+             params = JSON.parse(#{JSON.stringify(input)});
+  
+             #{code}
+             """
+  
+app.get('/task/:id/work', (req, res) ->
+  getTask(req, res)
+)
+
+app.options('/task/:id/work', (req, res) ->
+  getTask(req, res)
 )
 
 # Callback for when a task has finished for an input
