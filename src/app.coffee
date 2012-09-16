@@ -2,6 +2,7 @@ express = require 'express'
 fs = require 'fs'
 redis = require 'redis'
 coffee = require 'coffee-script'
+_ = require 'underscore'
 
 # Redis setup
 dbconfig = JSON.parse fs.readFileSync('etc/redis.json').toString()
@@ -66,6 +67,7 @@ app.get('/:id', (req, res) ->
       id: id
       ongoing: ongoing
       results: results || {}
+      results_length: _.size(results || {})
       title: title
       pending_count: pending_count
 )
