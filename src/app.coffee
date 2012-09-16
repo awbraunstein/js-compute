@@ -86,7 +86,7 @@ app.get('/:id/worker', (req, res) ->
   db.get "task:#{id}:code", (err, code) =>
     res.send """
              #{code}
-             #{SCRIPT.replace('HOST', HOST).replace('TASK_ID', req.param('id'))}
+             #{SCRIPT.replace(/HOST/g, HOST).replace(/TASK_ID/g, req.param('id'))}
              """
 )
 
