@@ -22,16 +22,19 @@ block content
       p
         | To start computing with js-compute, you need to create a task. Tasks
         | consist of a title, CoffeeScript code that computes a value, and
-        | a JSON array of inputs that you want to run your task on.
+        | a JSON array of inputs that you want to run your task on. The task must 
+        | start with <code>self.task = (args) -></code>, otherwise it won't run.
       p A sample task:
       pre
-        | # Test if a number is prime
-        | task = (args) ->
-        |   n = args.n
-        |   return prime: false if n in [1, 2] or n % 2 is 0
-        |   for i in [3..Math.sqrt(n)] by 2
-        |     return prime: false if n % i is 0
-        |   prime: true
+        code(data-language='coffeescript')
+          | # Test if a number is prime
+          | self.task = (args) ->
+          |   n = args.n
+          |   return prime: true if n is 2
+          |   return prime: false if n is 1 or n % 2 is 0
+          |   for i in [3..Math.sqrt(n)] by 2
+          |     return prime: false if n % i is 0
+          |   prime: true
       p And sample inputs:
       pre
         | [
@@ -43,4 +46,4 @@ block content
         | Once a task is created, you get an embed code that, when included
         | in a webpage, will start running your task for each input in that
         | client's browser. If 10 people are looking at that page, you now have
-        | 10 workers. Bam. Distributed cloud-computing.
+        | 10 workers. Bam!! Distributed cloud-computing.
