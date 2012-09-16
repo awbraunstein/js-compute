@@ -7,15 +7,18 @@ block content
     a.btn.btn-primary(href='/#{id}/results') Download results
   div.results
     strong Results
-    table.table.table-bordered
-      thead
-        tr
-          th Input
-          th Result
-      tbody
-        each result, input in results
+    - if (results_length != 0)
+      table.table.table-bordered
+        thead
           tr
-            td
-              pre= input
-            td
-              pre= result
+            th Input
+            th Result
+        tbody
+          each result, input in results
+            tr
+              td
+                pre= input
+              td
+                pre= result
+    - else
+      p You don't have any results yet :(

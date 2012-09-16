@@ -8,6 +8,7 @@
 			  "hiredis"      : "*",
 			  "redis"        : "*",
 			  "jade"         : "*",
-        "coffee-script": "*"
+        "coffee-script": "*",
+        "underscore"   : "*"
     }
 }
