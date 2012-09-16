@@ -1,16 +1,23 @@
 express = require 'express'
 fs = require 'fs'
 redis = require 'redis'
+coffee = require 'coffee-script'
 
+# Redis setup
 dbconfig = JSON.parse fs.readFileSync('etc/redis.json').toString()
 db = redis.createClient(dbconfig['port'] || 6379, dbconfig['host'] || 'localhost')
 
 db.on 'error', (err) ->
   console.log "Redis error: #{err}"
 
+# Other boilerplate...
 app = express()
 
 app.use(express.bodyParser())
+
+app.set('views', __dirname + '/../views')
+app.use(express.static(__dirname + '/../public'))
+app.engine('jade', require('jade').__express)
 
 app.all('/*', (req, res, next) ->
   res.header('Access-Control-Allow-Origin', '*')
@@ -18,49 +25,58 @@ app.all('/*', (req, res, next) ->
   next()
 )
 
+# Serve form for creating a new task
 app.get('/', (req, res) ->
-  res.send 'Hello World'
+  res.render 'new_task.jade'
 )
 
-app.get('/index.html', (req, res) ->
-  fs.readFile('./public/index.html', 'utf8', (err,data) ->
-    if err
-      return console.log(err)
-    res.send data
-  )
-)
-
-app.get('/js-compute.js', (req, res) ->
-  fs.readFile('./public/js-compute.js', 'utf8', (err,data) ->
-    if err
-      return console.log(err)
-    res.send data
-  )
-)
-
-app.get('/run-me.js', (req, res) ->
-  fs.readFile('./public/run-me.js', 'utf8', (err,data) ->
-    if err
-      return console.log(err)
-    res.send data
-  )
-)
-
-# Create a task
-app.post('/task/create', (req, res) ->
-  code = req.param('code')
-  inputs = req.param('inputs')
+# Create a new task
+app.post('/', (req, res) ->
+  title = req.param('title')
+  code = coffee.compile(req.param('code'))
+  inputs = JSON.parse(req.param('inputs'))
   db.get('task:last_id', (err, id) =>
     id = parseInt(id)
     db.incr('task:last_id')
+    db.set("task:#{id}:title", title)
     db.set("task:#{id}:code", code)
     db.sadd('task:all', id)
     db.sadd('task:ongoing', id)
     # Should be a way to lpush everything at once
     for input in inputs
       db.lpush("task:#{id}:inputs", JSON.stringify(input))
-    res.send id: id
+    res.redirect("/#{id}")
   )
+)
+
+# Dashboard for a task
+app.get('/:id', (req, res) ->
+  id = req.param('id')
+  db.multi([
+    ['sismember', 'task:ongoing', id],
+    ['llen', "task:#{id}:inputs"],
+    ['hgetall', "task:#{id}:results"],
+    ['get', "task:#{id}:title"],
+  ]).exec (err, replies) =>
+    [ongoing, pending_count, results, title] = replies
+    res.render 'task.jade',
+      id: id
+      ongoing: ongoing
+      results: results
+      title: title
+      pending_count: pending_count
+)
+
+# JSON of results for a task
+app.get('/:id/results', (req, res) ->
+  id = req.param('id')
+  db.hgetall "task:#{id}:results", (err, results) =>
+    res.send results
+)
+
+# Worker script (script to be embedded)
+app.get('/:id/worker', (req, res) ->
+  
 )
 
 # Work on a random task
@@ -98,14 +114,6 @@ app.post('/task/:id/work', (req, res) ->
       db.sadd('task:completed', id)
       db.srem('task:ongoing', id)
     res.send more: len isnt 0
-  )
-)
-
-# Get results for a task so far
-app.get('/task/:id', (req, res) ->
-  db.hgetall("task:#{req.param('id')}:results", (err, reply) =>
-    # Output should be better later
-    res.send reply
   )
 )
 

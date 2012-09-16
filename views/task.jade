@@ -1,0 +1,21 @@
+extends layout
+block content
+  h3= title
+  - if (ongoing)
+    p #{pending_count} results pending.
+  - else
+    a.btn.btn-primary(href='/#{id}/results') Download results
+  div.results
+    strong Results
+    table.table.table-bordered
+      thead
+        tr
+          th Input
+          th Result
+      tbody
+        each result, input in results
+          tr
+            td
+              pre= input
+            td
+              pre= result

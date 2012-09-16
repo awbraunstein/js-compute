@@ -1,0 +1,46 @@
+extends layout
+block content
+  div.row
+    div.span6
+      form(method='POST', action='')
+        div.control-group
+          label.control-label Title
+          div.controls
+            input.span6(type='text', name='title', id='title')
+        div.control-group
+          label.control-label CoffeeScript code
+          div.controls
+            textarea.span6(name='code', id='code', rows='10')
+        div.control-group
+          label.control-label JSON inputs
+          div.controls
+            textarea.span6(name='inputs', id='inputs', rows='10')
+        button.btn.btn-primary(type='submit') Create task
+    div.span6
+      p.lead
+        | js-compute is a distributed JavaScript cloud-computing platform.
+      p
+        | To start computing with js-compute, you need to create a task. Tasks
+        | consist of a title, CoffeeScript code that computes a value, and
+        | a JSON array of inputs that you want to run your task on.
+      p A sample task:
+      pre
+        | # Test if a number is prime
+        | task = (args) ->
+        |   n = args.n
+        |   return prime: false if n in [1, 2] or n % 2 is 0
+        |   for i in [3..Math.sqrt(n)] by 2
+        |     return prime: false if n % i is 0
+        |   prime: true
+      p And sample inputs:
+      pre
+        | [
+        |   { n: 1 },
+        |   { n: 2 },
+        |   // ...
+        | ]
+      p
+        | Once a task is created, you get an embed code that, when included
+        | in a webpage, will start running your task for each input in that
+        | client's browser. If 10 people are looking at that page, you now have
+        | 10 workers. Bam. Distributed cloud-computing.
