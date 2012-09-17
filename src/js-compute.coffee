@@ -1,11 +1,11 @@
-workerFunction = () ->
-  start = () =>
+workerFunction = ->
+  start = =>
 
     @more = false
-    cond = () => @more
+    cond = => @more
     @doWhile(runCode, cond)
 
-  runCode = () =>
+  runCode = =>
     importScripts("HOST/task/TASK_ID/work")
     response =
       result: task(params)
